@@ -25,11 +25,3 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	}
 	return (0);
 }
-/*
- * Desc
- * 	Compare n bytes betwen s1 and s2.
- *
- * Return
- * 	Positive if s1 is higher 0 if equal
- * 	negative if lower.
- */

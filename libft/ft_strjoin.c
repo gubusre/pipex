@@ -34,11 +34,3 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	res[len1 + len2] = '\0';
 	return (res);
 }
-/*
- * Desc
- * 	Create a new string with the length of s1 + s2
- * 	and copy them there (joining);
- *
- * Return
- * 	The resultant string after copy.
- */

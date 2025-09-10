@@ -34,8 +34,3 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	}
 	return (ss);
 }
-/* Return 
- * 	NULL when parameter sent is invalid or mem alloc is not possible, 
- * 	if mem alloc is possible always return what is expected, 
- * 	even if it's something empty.
- */

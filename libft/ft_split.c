@@ -82,25 +82,3 @@ char	**ft_split(char const *s, char c)
 		return (NULL);
 	return (spliter(result, s, c, w_count));
 }
-/*
-#include <stdio.h>
-
-int	main(int argc, const char *argv[])
-{
-	char	**tmp;
-	int	i;
-
-	if (argc != 2)
-		return (0);
-	tmp = ft_split(argv[1], ' ');
-	i = 0;
-	*tmp[3] = NULL;
-	while (tmp[i])
-	{
-		printf("%s\n", tmp[i]);
-		free(tmp[i]);
-		i++;
-	}
-	return (0);
-}
-*/

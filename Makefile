@@ -24,7 +24,7 @@ OBJ_DIR = obj
 INCLUDE_DIR = include
 
 # Archivos fuente
-SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/errors.c
+SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/utils.c
 LIBFT_SRCS = $(LIBFT_DIR)/ft_bzero.c \
              $(LIBFT_DIR)/ft_calloc.c \
              $(LIBFT_DIR)/ft_memcpy.c \
@@ -33,7 +33,7 @@ LIBFT_SRCS = $(LIBFT_DIR)/ft_bzero.c \
              $(LIBFT_DIR)/ft_strdup.c \
              $(LIBFT_DIR)/ft_strlen.c \
              $(LIBFT_DIR)/ft_substr.c \
-	     $(LIBFT_DIR)/ft_strncmp.c
+	    	 $(LIBFT_DIR)/ft_strncmp.c
 
 # Archivos objeto
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
