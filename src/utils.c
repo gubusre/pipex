@@ -6,46 +6,33 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/08 11:15:52 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/10 16:29:26 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/15 15:43:41 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	errors(int fd_type, const char *file)
+void    free_array(char **arr)
 {
-	if (access(file, F_OK) == -1)
-	{
-		printf("Error: %s %s\n", file, strerror(errno));
-		return (-1);
-	}
-	if ((fd_type == 0 && access(file, R_OK) == -1)
-		|| (fd_type != 0 && access(file, W_OK) == -1))
-	{
-		printf("Error: %s %s\n", file, strerror(errno));
-		return (-1);
-	}
-	return (0);
+        int     i;
+
+        i = 0;
+        while (arr[i])
+                free(arr[i++]);
+        free(arr);
 }
 
-void	free_array(char **arr)
-{
-	int	i;
-
-	i = 0;
-	while (arr[i])
-		free(arr[i++]);
-	free(arr);
-}
-
-void	exec_cmd(char *cmd_str, char **envp)
+void	exec_cmd(char *cmd, char **envp)
 {
 	char	**args;
 	char	*path;
-
-	args = ft_split(cmd_str, ' ');
+	
+	args = ft_split(cmd, ' ');
 	if (!args)
+	{
+		perror("Memory allocation failed");
 		exit(1);
+	}
 	path = find_path(args[0], envp);
 	if (!path)
 	{
@@ -54,8 +41,6 @@ void	exec_cmd(char *cmd_str, char **envp)
 		exit(127);
 	}
 	execve(path, args, envp);
-	free(path);
-	free_array(args);
 	perror("execve");
 	exit(1);
 }
