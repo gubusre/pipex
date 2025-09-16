@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 14:02:43 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/10 14:16:55 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/16 16:53:35 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,21 @@
 # include <stdio.h>
 # include <errno.h>
 
+typedef struct s_p
+{
+	char	**argv;
+	char	**envp;
+	char	*msg;
+	int	fd[2];
+	int	pipex;
+	int	argc;
+	int	infile;
+	int	outfile;
+	int	pid;
+	int	i;
+} t_p;
+
 void	exec_cmd(char *cmd_str, char **envp);
 char	*find_path(char *cmd, char **envp);
-
+void	handle_errors(t_p p);
 #endif
