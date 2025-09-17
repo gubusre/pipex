@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/08 11:15:52 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/17 18:20:17 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/17 21:36:07 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,19 @@
 
 void	handle_error(t_p p)
 {
-	if (p.argc < 3)
+	if (p.argc == 1)
 	{
 		write(2, "zsh: parse error near `\\n'\n", 27);
+		exit(1);
+	}
+	if (p.argv[1][0] == '|' && p.argv[1][1] == '|')
+	{
+		write(2, "zsh: parse error near `||'\n", 28);
+		exit(1);
+	}
+	if (p.argv[1][0] == '|' && p.argv[1][1] != '|')
+	{
+		write(2, "zsh: parse error near `|'\n", 27);
 		exit(1);
 	}
 	if (p.msg)
