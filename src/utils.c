@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/08 11:15:52 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/16 16:54:09 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/17 18:20:17 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 
 void	handle_error(t_p p)
 {
+	if (p.argc < 3)
+	{
+		write(2, "zsh: parse error near `\\n'\n", 27);
+		exit(1);
+	}
 	if (p.msg)
 		perror(p.msg);
 	if (p.infile >= 0)

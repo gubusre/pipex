@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 14:02:43 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/17 12:46:08 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/17 18:19:47 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ typedef struct s_p
 	char	**argv;
 	char	**envp;
 	char	*msg;
+	char	*cmd;
 	int		fd[2];
 	int		pipex;
 	int		argc;
