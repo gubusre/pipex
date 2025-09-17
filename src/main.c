@@ -6,26 +6,11 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:15:10 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/16 17:32:51 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/17 12:44:49 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-static void	handle_error(t_p p)
-{
-	if (p.msg)
-		perror(p.msg);
-	if (p.infile >= 0)
-		close(p.infile);
-	if (p.outfile >= 0)
-		close(p.outfile);
-	if (p.fd[0] >= 0)
-		close(p.fd[0]);
-	if (p.fd[1] >= 0)
-		close(p.fd[1]);
-	exit(1);
-}
 
 static int	ft_first_child(t_p p)
 {
