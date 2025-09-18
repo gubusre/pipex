@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 14:02:43 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/18 17:42:22 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/18 19:29:00 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ typedef struct s_p
 
 char	*find_path(char *cmd, char **envp);
 char	*build_e_msg(const char *prefix, const char *error, const char *cmd);
+int	ft_first_child(t_p p);
+int	ft_childs(t_p p);
+int	ft_last_child(t_p p);
 void	exec_cmd(t_p p);
 void	handle_error(t_p p);
 void	free_array(char **arr);

@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>					+#+  +:+	   +#+		*/
 /*												+#+#+#+#+#+   +#+		   */
 /*   Created: 2025/09/08 11:15:52 by gubusque		  #+#	#+#			 */
-/*   Updated: 2025/09/18 18:57:25 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/18 20:50:52 by gubusque         ###   ########.fr       */
 /*																			*/
 /* ************************************************************************** */
 
@@ -31,18 +31,10 @@ char	*build_e_msg(const char *prefix, const char *error, const char *cmd)
 	if (!msg)
 		return (NULL);
 	temp = msg;
-	msg = ft_strjoin(temp, cmd);
+	msg = ft_strjoin(temp, cmd_s);
 	free(temp);
 	if (!msg)
-		
-Hoy
-Ayer
-Esta semana
-
-Hoy
-Ayer
-Esta semana
-return (NULL);
+		return (NULL);
 	temp = msg;
 	msg = ft_strjoin(temp, "\n");
 	free(temp);
@@ -94,7 +86,7 @@ void	exec_cmd(t_p p)
 	p.args = ft_split(p.cmd, ' ');
 	if (!p.args)
 	{
-		e_msg = build_e_msg("zsh: ", "memory allocation failed: ", p.cmd);
+		e_msg = build_e_msg("zsh: ", "memory allocation failed", p.cmd);
 		write(2, e_msg, ft_strlen(e_msg));
 		free(e_msg);
 		exit(1);
@@ -103,7 +95,7 @@ void	exec_cmd(t_p p)
 	if (!p.path)
 	{
 		free_array(p.args);
-		e_msg = build_e_msg("zsh: ", "command not found: ", p.cmd);
+		e_msg = build_e_msg("zsh: ", "command not found", p.cmd);
 		write(2, e_msg, ft_strlen(e_msg));
 		free(e_msg);
 		exit(1);
@@ -121,6 +113,7 @@ char	*find_path(char *cmd, char **envp)
 	char	**paths;
 	char	*path_str;
 	char	*candidate;
+	char	*temp;
 	int		i;
 
 	if (!cmd || !cmd[0])
@@ -140,7 +133,9 @@ char	*find_path(char *cmd, char **envp)
 	i = 0;
 	while (paths[i])
 	{
-		candidate = ft_strjoin(ft_strjoin(paths[i], "/"), cmd);
+		temp = ft_strjoin(paths[i], "/");
+		candidate = ft_strjoin(temp, cmd);
+		free(temp);
 		if (access(candidate, X_OK) == 0)
 			return (free_array(paths), candidate);
 		free(candidate);
