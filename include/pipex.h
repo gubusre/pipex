@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 14:02:43 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/18 12:34:25 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/18 17:42:22 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ typedef struct s_p
 	char	**argv;
 	char	**envp;
 	char	**args;
-	char	*msg;
+	char	*path;
 	char	*cmd;
 	int		fd[2];
 	int		pipex;
@@ -39,7 +39,9 @@ typedef struct s_p
 	int		norminette;
 }	t_p;
 
-void	exec_cmd(t_p p);
 char	*find_path(char *cmd, char **envp);
+char	*build_e_msg(const char *prefix, const char *error, const char *cmd);
+void	exec_cmd(t_p p);
 void	handle_error(t_p p);
+void	free_array(char **arr);
 #endif
