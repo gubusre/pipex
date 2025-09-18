@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:15:10 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/17 21:32:59 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/18 12:44:25 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,17 @@ static int	ft_first_child(t_p p)
 {
 	close(p.fd[0]);
 	close(p.pipex);
+	if (p.argc > 3)
+		p.cmd = p.argv[2];
 	p.infile = open(p.argv[1], O_RDONLY);
 	if (p.infile < 0)
 	{
 		if (errno == ENOENT && p.argc == 2)
 		{
-			p.outfile = open(p.argv[p.argc - 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
-			close(p.outfile);
+			p.outfile = open(p.argv[p.argc - 1],
+					O_CREAT | O_WRONLY | O_TRUNC, 0644);
+			if (p.outfile)
+				close(p.outfile);
 			exit(1);
 		}
 		p.msg = p.argv[1];
@@ -31,34 +35,33 @@ static int	ft_first_child(t_p p)
 	if (dup2(p.infile, STDIN_FILENO) == -1)
 		handle_error(p);
 	close(p.infile);
-	if (p.argc > 2)
-	{
-		if (dup2(p.fd[1], STDOUT_FILENO) == -1)
-			handle_error(p);
-	}
+	if ((p.argc > 2) && (dup2(p.fd[1], STDOUT_FILENO) == -1))
+		handle_error(p);
 	close(p.fd[1]);
 	if (p.argc <= 3)
-		exec_cmd(p.cmd, p.envp);
+		exec_cmd(p);
 	if (p.argc > 3)
-		exec_cmd(p.argv[2], p.envp);
+		exec_cmd(p);
 	exit(1);
 }
 
 static int	ft_childs(t_p p)
 {
+	p.msg = p.argv[p.i];
 	if (dup2(p.pipex, STDIN_FILENO) == -1)
 		handle_error(p);
 	close(p.pipex);
 	if (dup2(p.fd[1], STDOUT_FILENO) == -1)
 		handle_error(p);
 	close(p.fd[1]);
-	if (p.argc > 4)
-		exec_cmd(p.argv[p.i], p.envp);
+	exec_cmd(p);
 	exit(1);
 }
 
 static int	ft_last_child(t_p p)
 {
+	if (p.argc > 3)
+		p.msg = p.argv[p.argc - 2];
 	if (dup2(p.pipex, STDIN_FILENO) == -1)
 		handle_error(p);
 	close(p.pipex);
@@ -68,29 +71,15 @@ static int	ft_last_child(t_p p)
 	if (dup2(p.outfile, STDOUT_FILENO) == -1)
 		handle_error(p);
 	if (p.argc < 3)
-		exec_cmd(p.cmd, p.envp);
+		exec_cmd(p);
 	close(p.outfile);
-	if (p.argc == 3 )
-		exec_cmd(p.cmd, p.envp);
-	if (p.argc > 3)
-		exec_cmd(p.argv[p.argc - 2], p.envp);
+	if (p.argc >= 3)
+		exec_cmd(p);
 	exit(1);
 }
 
-int	main(int argc, char *argv[], char *envp[])
+static void	ft_run(t_p p)
 {
-	t_p	p;
-
-	p.argc = argc;
-	p.argv = argv;
-	p.envp = envp;
-	if ((p.argc == 1) || (p.argv[1][0] == '|' && p.argv[1][1] == '|')
-		|| (p.argv[1][0] == '|' && p.argv[1][1] != '|'))
-		handle_error(p);
-	if (p.argc <= 3)
-		p.cmd = "cat ";
-	pipe(p.fd);
-	p.pid = fork();
 	if (p.pid == 0)
 		ft_first_child(p);
 	p.i = 1;
@@ -106,7 +95,7 @@ int	main(int argc, char *argv[], char *envp[])
 				ft_childs(p);
 		}
 	}
-	if (p.argc != 2)
+	if (p.argc > 2)
 	{
 		p.pipex = p.fd[0];
 		close(p.fd[1]);
@@ -114,9 +103,23 @@ int	main(int argc, char *argv[], char *envp[])
 		if (p.pid == 0)
 			ft_last_child(p);
 	}
-	while (wait(NULL))
-	{
-		if (wait(NULL) < 0)
-			return (0);
-	}
+}
+
+int	main(int argc, char *argv[], char *envp[])
+{
+	t_p	p;
+
+	p.argc = argc;
+	p.argv = argv;
+	p.envp = envp;
+	if (p.argc == 1 || (p.argv[1][0] == '|'))
+		handle_error(p);
+	p.cmd = "cat ";
+	p.msg = "zsh: ";
+	pipe(p.fd);
+	p.pid = fork();
+	ft_run(p);
+	while (wait(NULL) >= 0)
+		p.norminette += 1;
+	return (0);
 }

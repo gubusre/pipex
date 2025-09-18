@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/08 11:15:52 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/17 21:36:07 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/18 12:46:43 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,12 @@ void	handle_error(t_p p)
 		write(2, "zsh: parse error near `\\n'\n", 27);
 		exit(1);
 	}
-	if (p.argv[1][0] == '|' && p.argv[1][1] == '|')
-	{
-		write(2, "zsh: parse error near `||'\n", 28);
-		exit(1);
-	}
-	if (p.argv[1][0] == '|' && p.argv[1][1] != '|')
-	{
-		write(2, "zsh: parse error near `|'\n", 27);
+	if (p.argc >= 2)
+	{			
+		if (p.argv[1][0] == '|' && p.argv[1][1] == '|')
+			write(2, "zsh: parse error near `||'\n", 28);
+		if (p.argv[1][0] == '|' && p.argv[1][1] != '|')
+			write(2, "zsh: parse error near `|'\n", 27);
 		exit(1);
 	}
 	if (p.msg)
@@ -52,25 +50,26 @@ void	free_array(char **arr)
 	free(arr);
 }
 
-void	exec_cmd(char *cmd, char **envp)
+void	exec_cmd(t_p p)
 {
-	char	**args;
 	char	*path;
 
-	args = ft_split(cmd, ' ');
-	if (!args)
+	p.args = ft_split(p.cmd, ' ');
+	if (!p.args)
 	{
-		perror("Memory allocation failed");
+		perror("zsh: memory allocation failed");
 		exit(1);
 	}
-	path = find_path(args[0], envp);
+	path = find_path(p.args[0], p.envp);
 	if (!path)
 	{
-		free_array(args);
-		perror("Command not found");
+		free_array(p.args);
+		write(2, "zsh: command not found: ", 25);
+		write(2, path, 1);
+		write(2, "\n", 1);
 		exit(127);
 	}
-	execve(path, args, envp);
+	execve(path, p.args, p.envp);
 	perror("execve");
 	exit(1);
 }
