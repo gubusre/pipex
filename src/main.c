@@ -6,7 +6,7 @@
 /*   By: gubusque <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:15:10 by gubusque          #+#    #+#             */
-/*   Updated: 2025/09/18 12:44:25 by gubusque         ###   ########.fr       */
+/*   Updated: 2025/09/18 12:53:21 by gubusque         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,6 @@ static int	ft_first_child(t_p p)
 {
 	close(p.fd[0]);
 	close(p.pipex);
-	if (p.argc > 3)
-		p.cmd = p.argv[2];
 	p.infile = open(p.argv[1], O_RDONLY);
 	if (p.infile < 0)
 	{
@@ -38,10 +36,7 @@ static int	ft_first_child(t_p p)
 	if ((p.argc > 2) && (dup2(p.fd[1], STDOUT_FILENO) == -1))
 		handle_error(p);
 	close(p.fd[1]);
-	if (p.argc <= 3)
-		exec_cmd(p);
-	if (p.argc > 3)
-		exec_cmd(p);
+	exec_cmd(p);
 	exit(1);
 }
 
@@ -116,6 +111,8 @@ int	main(int argc, char *argv[], char *envp[])
 		handle_error(p);
 	p.cmd = "cat ";
 	p.msg = "zsh: ";
+	if (p.argc > 3)
+		p.cmd = p.argv[2];
 	pipe(p.fd);
 	p.pid = fork();
 	ft_run(p);
