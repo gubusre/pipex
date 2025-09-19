@@ -12,52 +12,41 @@
 
 #include "pipex.h"
 
-char	*build_e_msg(const char *prefix, const char *error, const char *cmd)
+void	write_e_msg(t_p p)
 {
 	char	*msg;
 	char	*temp;
-	char	*cmd_s;
 
-	if (cmd && cmd[0] != '\0')
-		cmd_s = (char *)cmd;
+	msg = ft_strjoin("zsh: ", p.e_m);
+	if (!msg)
+		exit(1);
+	temp = msg;
+	if (p.argc < 5)
+		msg = ft_strjoin(temp, "\nUsage: ");
 	else
-		cmd_s = "unknow";
-	msg = ft_strjoin(prefix, error);
-	if (!msg)
-		return (NULL);
-	temp = msg;
-	msg = ft_strjoin(temp, ": ");
+		msg = ft_strjoin(temp, ": ");
 	free(temp);
 	if (!msg)
-		return (NULL);
+		exit(1);
 	temp = msg;
-	msg = ft_strjoin(temp, cmd_s);
+	msg = ft_strjoin(temp, p.cmd);
 	free(temp);
 	if (!msg)
-		return (NULL);
+		exit(1);
 	temp = msg;
 	msg = ft_strjoin(temp, "\n");
 	free(temp);
-	return (msg);
+	write(2, msg, ft_strlen(msg));
+	exit(1);
 }
 
 void	handle_error(t_p p)
 {
-	char	*error_str;
-	char	*error_msg;
-
 	if (p.path)
-	{
-		if (errno == EACCES)
-			error_str = "permission denied";
-		else
-			error_str = strerror(errno);
-	}
-	else
-		error_str = strerror(errno);
-	error_msg = build_e_msg("zsh: ", error_str, p.cmd);
-	write(2, error_msg, ft_strlen(error_msg));
-	free(error_msg);
+		p.e_m = strerror(errno);
+	else if (p.argc >= 5)
+		p.e_m = strerror(errno);
+	write_e_msg(p);
 	if (p.infile >= 0)
 		close(p.infile);
 	if (p.outfile >= 0)
@@ -69,7 +58,7 @@ void	handle_error(t_p p)
 	exit(1);
 }
 
-void	free_array(char **arr)
+static void	free_array(char **arr)
 {
 	int	i;
 
@@ -79,36 +68,7 @@ void	free_array(char **arr)
 	free(arr);
 }
 
-void	exec_cmd(t_p p)
-{
-	char	*e_msg;
-
-	p.args = ft_split(p.cmd, ' ');
-	if (!p.args)
-	{
-		e_msg = build_e_msg("zsh: ", "memory allocation failed", p.cmd);
-		write(2, e_msg, ft_strlen(e_msg));
-		free(e_msg);
-		exit(1);
-	}
-	p.path = find_path(p.args[0], p.envp);
-	if (!p.path)
-	{
-		free_array(p.args);
-		e_msg = build_e_msg("zsh: ", "command not found", p.cmd);
-		write(2, e_msg, ft_strlen(e_msg));
-		free(e_msg);
-		exit(1);
-	}
-	if (execve(p.path, p.args, p.envp) == -1)
-	{
-		free_array(p.args);
-		free(p.path);
-		handle_error(p);
-	}
-}
-
-char	*find_path(char *cmd, char **envp)
+static char	*find_path(char *cmd, char **envp)
 {
 	char	**paths;
 	char	*path_str;
@@ -142,4 +102,27 @@ char	*find_path(char *cmd, char **envp)
 		i++;
 	}
 	return (free_array(paths), NULL);
+}
+
+void	exec_cmd(t_p p)
+{
+	p.args = ft_split(p.cmd, ' ');
+	if (!p.args)
+	{
+		p.e_m = "memory allocation failed";
+		write_e_msg(p);
+	}
+	p.path = find_path(p.args[0], p.envp);
+	if (!p.path)
+	{
+		free_array(p.args);
+		p.e_m = "command not found";
+		write_e_msg(p);
+	}
+	if (execve(p.path, p.args, p.envp) == -1)
+	{
+		free_array(p.args);
+		free(p.path);
+		perror("execve");
+	}
 }
