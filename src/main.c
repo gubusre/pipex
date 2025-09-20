@@ -77,7 +77,6 @@ static void	ft_run_father(t_p p)
 int	main(int argc, char *argv[], char *envp[])
 {
 	t_p	p;
-	int	status;
 
 	p.argc = argc;
 	p.argv = argv;
@@ -85,7 +84,6 @@ int	main(int argc, char *argv[], char *envp[])
 	p.cmd = p.argv[0];
 	p.e_m = "systemcall failed";
 	p.cmd = "pipe";
-	p.exit = 0;
 	if (p.argc < 5)
 	{
 		p.e_m = "Invalid number of arguments.";
@@ -97,10 +95,7 @@ int	main(int argc, char *argv[], char *envp[])
 	close(p.fd[0]);
 	close(p.fd[1]);
 	close(p.pipex);
-	while (wait(&status) > 0)
-	{
-		if (WIFEXITED(status))
-			p.exit = (WEXITSTATUS(status));
-	}
-	return (p.exit);
+	while (wait(NULL) > 0)
+		;
+	return (0);
 }
