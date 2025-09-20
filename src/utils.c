@@ -74,13 +74,15 @@ void	exec_cmd(t_p p)
 char	*ft_find_path(t_p p)
 {
 	char	*path_string;
+	char	*program;
 	int		i;
 
-	if (!p.cmd || !p.cmd[0])
+	program = p.argv[0];
+	if (!program || !program[0])
 		return (NULL);
-	if (p.cmd[0] == '.' && p.cmd[1] == '/')
+	if (program[0] == '.' && program[1] == '/')
 	{
-		if (access(p.cmd, X_OK) != 0)
+		if (access(program, X_OK) != 0)
 			return (NULL);
 	}
 	else

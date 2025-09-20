@@ -16,9 +16,9 @@ static void	ft_run_l_child(t_p p)
 {
 	if (p.pid == -1)
 	{
-		write(2, "zsh: systemcall failed: fork\n", 30);
+		p.cmd = "fork";
 		close(p.pipex);
-		exit(1);
+		write_e_msg(p);
 	}
 	if (p.pid == 0)
 		ft_last_child(p);
@@ -28,10 +28,10 @@ static void	ft_run_m_child(t_p p)
 {
 	if (p.pid == -1)
 	{
-		write(2, "zsh: systemcall failed: fork\n", 30);
+		p.cmd = "fork";
 		close(p.fd[0]);
 		close(p.fd[1]);
-		exit(1);
+		write_e_msg(p);
 	}
 	if (p.pid == 0)
 		ft_childs(p);
@@ -41,10 +41,10 @@ static void	ft_run_f_child(t_p p)
 {
 	if (p.pid == -1)
 	{
-		write(2, "zsh: systemcall failed: fork\n", 30);
+		p.cmd = "fork";
 		close(p.fd[0]);
 		close(p.fd[1]);
-		exit(1);
+		write_e_msg(p);
 	}
 	if (p.pid == 0)
 		ft_first_child(p);
@@ -54,10 +54,7 @@ static void	ft_run_father(t_p p)
 {
 	p.path_str = ft_find_path(p);
 	if (pipe(p.fd) == -1)
-	{
-		write(2, "zsh: systemcall failed: pipe\n", 30);
-		exit(1);
-	}
+		write_e_msg(p);
 	p.pid = fork();
 	ft_run_f_child(p);
 	p.pipex = p.fd[0];
@@ -66,10 +63,7 @@ static void	ft_run_father(t_p p)
 	while ((p.argc - 2) > p.i)
 	{
 		if (pipe(p.fd) == -1)
-		{
-			write(2, "zsh: systemcall failed: pipe\n", 30);
-			exit(1);
-		}
+			write_e_msg(p);
 		p.pid = fork();
 		ft_run_m_child(p);
 		p.pipex = p.fd[0];
@@ -89,7 +83,8 @@ int	main(int argc, char *argv[], char *envp[])
 	p.argv = argv;
 	p.envp = envp;
 	p.cmd = p.argv[0];
-	
+	p.e_m = "systemcall failed";
+	p.cmd = "pipe";
 	p.exit = 0;
 	if (p.argc < 5)
 	{
