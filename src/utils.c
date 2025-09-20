@@ -12,52 +12,6 @@
 
 #include "pipex.h"
 
-void	write_e_msg(t_p p)
-{
-	char	*msg;
-	char	*temp;
-
-	msg = ft_strjoin("zsh: ", p.e_m);
-	if (!msg)
-		exit(1);
-	temp = msg;
-	if (p.argc < 5)
-		msg = ft_strjoin(temp, "\nUsage: ");
-	else
-		msg = ft_strjoin(temp, ": ");
-	free(temp);
-	if (!msg)
-		exit(1);
-	temp = msg;
-	msg = ft_strjoin(temp, p.cmd);
-	free(temp);
-	if (!msg)
-		exit(1);
-	temp = msg;
-	msg = ft_strjoin(temp, "\n");
-	free(temp);
-	write(2, msg, ft_strlen(msg));
-	exit(1);
-}
-
-void	handle_error(t_p p)
-{
-	if (p.path)
-		p.e_m = strerror(errno);
-	else if (p.argc >= 5)
-		p.e_m = strerror(errno);
-	write_e_msg(p);
-	if (p.infile >= 0)
-		close(p.infile);
-	if (p.outfile >= 0)
-		close(p.outfile);
-	if (p.fd[0] >= 0)
-		close(p.fd[0]);
-	if (p.fd[1] >= 0)
-		close(p.fd[1]);
-	exit(1);
-}
-
 static void	free_array(char **arr)
 {
 	int	i;
@@ -68,61 +22,74 @@ static void	free_array(char **arr)
 	free(arr);
 }
 
-static char	*find_path(char *cmd, char **envp)
+static char	*find_cmd(char *cmd, t_p p)
 {
-	char	**paths;
-	char	*path_str;
-	char	*candidate;
 	char	*temp;
+	char	*candidate;
 	int		i;
 
-	if (!cmd || !cmd[0])
-		return (NULL);
-	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
-		if (access(cmd, X_OK) == 0)
-			return (ft_strdup(cmd));
 	i = 0;
-	while (envp[i] && ft_strncmp(envp[i], "PATH=", 5) != 0)
-		i++;
-	if (!envp[i])
+	p.path = ft_split(p.path_str, ':');
+	if (!p.path)
 		return (NULL);
-	path_str = envp[i] + 5;
-	paths = ft_split(path_str, ':');
-	if (!paths)
-		return (NULL);
-	i = 0;
-	while (paths[i])
+	while (p.path[i])
 	{
-		temp = ft_strjoin(paths[i], "/");
+		temp = ft_strjoin(p.path[i], "/");
 		candidate = ft_strjoin(temp, cmd);
 		free(temp);
 		if (access(candidate, X_OK) == 0)
-			return (free_array(paths), candidate);
+			return (free_array(p.path), candidate);
 		free(candidate);
 		i++;
 	}
-	return (free_array(paths), NULL);
+	free_array(p.path);
+	return (NULL);
 }
 
 void	exec_cmd(t_p p)
 {
-	p.args = ft_split(p.cmd, ' ');
-	if (!p.args)
+	char	**args;
+
+	args = ft_split(p.cmd, ' ');
+	if (!args)
 	{
 		p.e_m = "memory allocation failed";
 		write_e_msg(p);
 	}
-	p.path = find_path(p.args[0], p.envp);
-	if (!p.path)
+	p.path_cmd = find_cmd(args[0], p);
+	if (!p.path_cmd)
 	{
-		free_array(p.args);
+		free_array(args);
 		p.e_m = "command not found";
 		write_e_msg(p);
 	}
-	if (execve(p.path, p.args, p.envp) == -1)
+	if (execve(p.path_cmd, args, p.envp) == -1)
 	{
-		free_array(p.args);
+		free_array(args);
 		free(p.path);
-		perror("execve");
+		perror("zsh: execve");
 	}
+}
+
+char	*ft_find_path(t_p p)
+{
+	char	*path_string;
+	int		i;
+
+	if (!p.cmd || !p.cmd[0])
+		return (NULL);
+	if (p.cmd[0] == '.' && p.cmd[1] == '/')
+	{
+		if (access(p.cmd, X_OK) != 0)
+			return (NULL);
+	}
+	else
+		return (NULL);
+	i = 0;
+	while (p.envp[i] && ft_strncmp(p.envp[i], "PATH=", 5) != 0)
+		i++;
+	if (!p.envp[i])
+		return (NULL);
+	path_string = p.envp[i] + 5;
+	return (path_string);
 }

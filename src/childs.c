@@ -66,3 +66,49 @@ int	ft_first_child(t_p p)
 	exec_cmd(p);
 	exit(1);
 }
+
+void	write_e_msg(t_p p)
+{
+	char	*msg;
+	char	*temp;
+
+	msg = ft_strjoin("zsh: ", p.e_m);
+	if (!msg)
+		exit(1);
+	temp = msg;
+	if (p.argc < 5)
+		msg = ft_strjoin(temp, "\nUsage: ");
+	else
+		msg = ft_strjoin(temp, ": ");
+	free(temp);
+	if (!msg)
+		exit(1);
+	temp = msg;
+	msg = ft_strjoin(temp, p.cmd);
+	free(temp);
+	if (!msg)
+		exit(1);
+	temp = msg;
+	msg = ft_strjoin(temp, "\n");
+	free(temp);
+	write(2, msg, ft_strlen(msg));
+	exit(1);
+}
+
+void	handle_error(t_p p)
+{
+	if (p.path)
+		p.e_m = strerror(errno);
+	else if (p.argc >= 5)
+		p.e_m = strerror(errno);
+	write_e_msg(p);
+	if (p.infile >= 0)
+		close(p.infile);
+	if (p.outfile >= 0)
+		close(p.outfile);
+	if (p.fd[0] >= 0)
+		close(p.fd[0]);
+	if (p.fd[1] >= 0)
+		close(p.fd[1]);
+	exit(1);
+}
